@@ -1,3 +1,5 @@
+import math
+import os
 from copy import deepcopy
 from cont import *
 
@@ -26,7 +28,7 @@ def isColumnFull(Board, column):
         return True
     return False
 
-# Devolver movimientos válidos (lugares vacíos)
+# Devolver movimientos válidos (lugares vacíos) dentro del tablero
 def getValidMovements(Board):
     Columns = []
     for column in range(BOARD_WIDTH):
@@ -176,19 +178,19 @@ def find4(Board):
                 fourInLine, verticalCount = verticalInspection(rowIndex, columnIndex)
                 if fourInLine:
                     capFourInLine(rowIndex, columnIndex, 'vertical')
-                    FourInLineFlag = True
+                    fourInLineFlag = True
 
                 fourInLine, horizontalCount = horizontalInspection(rowIndex, columnIndex)
                 if fourInLine:
                     capFourInLine(rowIndex, columnIndex, 'horizontal')
-                    FourInLineFlag = True
+                    fourInLineFlag = True
 
                 fourInLine, slope, posCount, negCount = diagonalInspection(rowIndex, columnIndex)
                 if fourInLine:
                     capFourInLine(rowIndex, columnIndex, 'diagonal')
-                    FourInLineFlag = True
+                    fourInLineFlag = True
 
-    return FourInLineFlag
+    return fourInLineFlag
 
 def getEmptySpaces(Board):
     emptySpaces = 0
