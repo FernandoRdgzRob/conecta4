@@ -1,75 +1,79 @@
 import math
-import os
 from copy import deepcopy
 from cont import *
 
 WHITE   = '\033[1;37;40m'
 BLUE    = '\033[1;34;40m'
 RED     = '\033[1;31;40m'
+YELLOW  = '\033[1;33;40m'
+GREEN   = '\033[1;32;40m'
+MAGENTA = '\033[1;35;40m'
+RED_BG  = '\033[0;31;47m'
+BLUE_BG = '\033[0;34;47m'
 
-# Crear un tablero vacío
+# Función para inicializar un tablero vacío
 def initBoard():
     Board = []
     for i in range(BOARD_HEIGHT):
         Board.append([])
-    for j in range(BOARD_WIDTH):
-        Board[i].append(' ')
+        for j in range(BOARD_WIDTH):
+            Board[i].append(' ')
     return Board
 
-# Revisar el rango de búsqueda de filas y columnas
+# Función para comprobar el rango de búsqueda de filas y columnas del tablero
 def isRangeValid(row, column):
     if row >= 0 and column >= 0 and row < BOARD_HEIGHT and column < BOARD_WIDTH:
         return True
     return False
 
-# Revisar si una columna se encuentra llena o no
-def isColumnFull(Board, column):
-    if Board[0][column] == ' ':
+# Comprobar si una columna se encuentra llena o no
+def isColumnFull(Board, Column):
+    if Board[0][Column] == ' ':
         return True
     return False
 
-# Devolver movimientos válidos (lugares vacíos) dentro del tablero
+# Devolver todos los movimientos válidos (columnas vacías) dentro del tablero
 def getValidMovements(Board):
     Columns = []
-    for column in range(BOARD_WIDTH):
-        if isColumnFull(Board, column):
-            Columns.append(column)
+    for Column in range(BOARD_WIDTH):
+        if isColumnFull(Board, Column):
+            Columns.append(Column)
     return Columns
 
 # Coloca el movimiento actual del jugador en la columna seleccionada dentro del tablero
 # Se utiliza deepcopy para tomar una copia del tablero y no alterar el tablero original
-def makeMovement(Board, column, player):
-    tempBoard = deepcopy(Board)
+def makeMovement(board, column, player):
+    tempBoard = deepcopy(board)
     for row in range(5,-1,-1):
         if tempBoard[row][column] == ' ':
             tempBoard[row][column] = player
             return tempBoard, row, column
 
-# Revisa si la jugada hecha se hizo en un lugar válido o no
-def isMovementValid(column, Board):
+# Revisa si la jugada hecha se hizo en una columna vacía o no
+def isMovementValid(column, board):
     for row in range(BOARD_HEIGHT):
-        if Board[row][column] == ' ':
+        if board[row][column] == ' ':
             return True
     return False
 
 # Revisa si el tablero se encuentra lleno
 # Checa la primera fila y la columna seleccionada para ver si se encuentra llena o no
-def isBoardFull(Board):
+def isBoardFull(board):
     for row in range(BOARD_HEIGHT):
         for column in range(BOARD_WIDTH):
-            if Board[row][column] == ' ':
+            if board[row][column] == ' ':
                 return False
     return True
 
-# Encuentra si ya hay 4 o más fichas del mismo tipo en cualquier dirección
-def find4(Board):
+# Busca si ya hay 4 o más fichas del mismo tipo en cualquier dirección
+def find4(board):
 
-    # Encuentra 4 o más fichas del mismo tipo en una dirección vertical
+    # Busca 4 o más fichas del mismo tipo en una dirección vertical
     def verticalInspection(row, column):
         fourInLine = False
         count = 0
         for rowIndex in range(row, BOARD_HEIGHT):
-            if Board[rowIndex][column] == Board[row][column]:
+            if board[rowIndex][column] == board[row][column]:
                 count += 1
             else:
                 break
@@ -78,12 +82,12 @@ def find4(Board):
 
         return fourInLine, count
 
-    # Encuentra 4 o más fichas del mismo tipo en una dirección horizontal
+    # Busca 4 o más fichas del mismo tipo en una dirección horizontal
     def horizontalInspection(row, column):
         fourInLine = False
         count = 0
         for columnIndex in range(column, BOARD_WIDTH):
-            if Board[row][columnIndex] == Board[row][column]:
+            if board[row][columnIndex] == board[row][column]:
                 count += 1
             else:
                 break
@@ -99,9 +103,9 @@ def find4(Board):
         columnIndex = column
         # Revisa si hay diagonales con una pendiente positiva
         for rowIndex in range(row, BOARD_HEIGHT):
-            if columnIndex > BOARD_HEIGHT:
+            if columnIndex > BOARD_HEIGHT: # checa que no exceda los límites del tablero
                 break
-            elif Board[rowIndex][columnIndex] == Board[row][column]:
+            elif board[rowIndex][columnIndex] == board[row][column]:
                 count += 1
             else:
                 break
@@ -116,10 +120,10 @@ def find4(Board):
         count = 0
         slope = None
         columnIndex = column
-        for rowIndex in range(row, -1, -1):
+        for rowIndex in range(row, -1, -1): # Revisa que no se salga de los límites del tablero
             if columnIndex > 6:
                 break
-            elif Board[rowIndex][columnIndex] == Board[row][column]:
+            elif board[rowIndex][columnIndex] == board[row][column]:
                 count += 1
             else:
                 break
@@ -149,20 +153,21 @@ def find4(Board):
 
         return fourInLine, slope, posCount, negCount
 
+    # Mostrar en mayúsculas los elementos de la jugada ganadora
     def capFourInLine(row, column, direction):
         if direction == 'vertical':
             for rowIndex in range(verticalCount):
-                Board[row + rowIndex][column] = Board[row + rowIndex][column].upper()
+                board[row + rowIndex][column] = board[row + rowIndex][column].upper()
         elif direction == 'horizontal':
             for columnIndex in range(horizontalCount):
-                Board[row][column + columnIndex] = Board[row][column + columnIndex].upper()
+                board[row][column + columnIndex] = board[row][column + columnIndex].upper()
         elif dir == 'diagonal':
             if slope == 'positive' or slope == 'both':
                 for diagonalIndex in range(posCount):
-                    Board[row + diagonalIndex][column + diagonalIndex] = Board[row + diagonalIndex][column + diagonalIndex].upper()
+                    board[row + diagonalIndex][column + diagonalIndex] = board[row + diagonalIndex][column + diagonalIndex].upper()
             elif slope == 'negative' or slope == 'both':
                 for diagonalIndex in range(negCount):
-                    Board[row - diagonalIndex][column + diagonalIndex] = Board[row - diagonalIndex][column + diagonalIndex].upper()
+                    board[row - diagonalIndex][column + diagonalIndex] = board[row - diagonalIndex][column + diagonalIndex].upper()
 
     # Se inicializan las variables
     fourInLineFlag = False
@@ -171,10 +176,10 @@ def find4(Board):
     horizontalCount = 0
     posCount = 0
     negCount = 0
-
+    # En caso de que el tablero no se encuentre vacío, se revisa si hay 4 o más elementos del mismo tipo en línea (vertical, horizontal o diagonal)
     for rowIndex in range(BOARD_HEIGHT):
         for columnIndex in range(BOARD_WIDTH):
-            if Board[rowIndex][columnIndex] != ' ':
+            if board[rowIndex][columnIndex] != ' ':
                 fourInLine, verticalCount = verticalInspection(rowIndex, columnIndex)
                 if fourInLine:
                     capFourInLine(rowIndex, columnIndex, 'vertical')
@@ -189,36 +194,39 @@ def find4(Board):
                 if fourInLine:
                     capFourInLine(rowIndex, columnIndex, 'diagonal')
                     fourInLineFlag = True
-
     return fourInLineFlag
 
-def getEmptySpaces(Board):
+# Se obtiene el numero de ubicaciones válidas dentro del tablero
+def getEmptySpaces(board):
     emptySpaces = 0
     for row in range(BOARD_HEIGHT):
         for col in range(BOARD_WIDTH):
-            if Board[row][col] == ' ':
+            if board[row][col] == ' ':
                 emptySpaces += 1
     return emptySpaces
 
+# Se imprime el tablero
 def printBoard(Board):
+    # Se llama el método para obtener el numero de espacios vacíos
     emptySpaces = 42 - getEmptySpaces(Board)
     print('')
-    print('Ronda #' + str(emptySpaces))
+    print(YELLOW + '         Ronda #' + str(emptySpaces) + WHITE, end=" ")
     print('')
     print('')
     print("\t      1   2   3   4   5   6   7 ")
     print("\t      -   -   -   -   -   -   - ")
     for i in range(0, BOARD_HEIGHT, 1):
-        print("\t",i+1,' ',end="")
+        print(WHITE+"\t",i+1,' ',end="")
         for j in range(BOARD_WIDTH):
+            # Se imprimen las "fichas" de cada jugador en un color distinto
             if str(Board[i][j]) == 'x':
                 print("| " + BLUE + str(Board[i][j]) +WHITE, end=" ")
             elif str(Board[i][j]) == 'o':
                 print("| " + RED + str(Board[i][j]) +WHITE, end=" ")
             elif str(Board[i][j]) == 'X':
-                print("| " + BLUE + str(Board[i][j]) +WHITE, end=" ")
+                print("| " + BLUE_BG + str(Board[i][j]) +WHITE, end=" ")
             elif str(Board[i][j]) == 'O':
-                print("| " + RED + str(Board[i][j]) +WHITE, end=" ")
+                print("| " + RED_BG + str(Board[i][j]) +WHITE, end=" ")
             else:
                 print("| " + str(Board[i][j]), end=" ")
         print("|")
