@@ -27,16 +27,18 @@ def playerTurn(board):
 
     board = makeMovement(board, playerMove, HUMAN)[0]
     playerFourInLine = find4(board)
+    printBoard(board)
     return board, playerFourInLine
 
 # Se define lo que se hace si el humano gana
 def playerWins(board):
     printBoard(board)
     print('                    '+GREEN+"Has ganado!!\n" +WHITE)
-    playAgain = True if input (YELLOW +'¿Quieres jugar otra vez(s/n)?'+WHITE).lower == 's' else False
-    if playAgain:
+    playagain = True if input(YELLOW +'¿Quieres jugar de nuevo(s/n)?'+WHITE).lower() == 's' else False
+    if playagain:
+        board = None
         mainFunction()
-    return 0
+    return 0, board
 
 # Se definen acciones a realizar cuando es el turno de la computadora
 def aiTurn(board, depth):
@@ -49,10 +51,12 @@ def aiTurn(board, depth):
 def aiWins(Board):
     printBoard(Board)
     print('                    '+RED+ "La computadora ha ganado\n" +WHITE)
-    playAgain = True if input (YELLOW+'¿Quieres jugar otra vez(s/n)?'+WHITE).lower == 's' else False
-    if playAgain:
+    playagain = True if input(YELLOW+'¿Quieres jugar de nuevo(s/n)?'+WHITE).lower() == 's' else False
+    #saveBoard(board)
+    if playagain:
+        board = None
         mainFunction()
-    return 0
+    return 0, board
 
 # Se crean dificultades, esto ligado con la profundidad del árbol a evaluar con el algoritmo de poda Alpha-Beta
 def getDepth():
@@ -72,6 +76,8 @@ def getDepth():
 def mainFunction():
     # Se inicializa un nuevo tablero
     board = initBoard()
+    if board == None:
+        board = initBoard()
     printBoard(board)
     # Se obtiene la profundidad del árbol
     depth = getDepth()
