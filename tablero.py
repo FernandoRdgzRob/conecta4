@@ -210,7 +210,7 @@ def printBoard(Board):
     # Se llama el método para obtener el numero de espacios vacíos
     emptySpaces = 42 - getEmptySpaces(Board)
     print('')
-    print(YELLOW + '         Ronda #' + str(emptySpaces) + WHITE, end=" ")
+    print(YELLOW + '         Ronda #' + str(emptySpaces), end='')
     print('')
     print('')
     print("\t      1   2   3   4   5   6   7 ")

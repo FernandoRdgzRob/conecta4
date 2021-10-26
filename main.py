@@ -27,7 +27,7 @@ def playerTurn(board):
 
     board = makeMovement(board, playerMove, HUMAN)[0]
     playerFourInLine = find4(board)
-    printBoard(board)
+    print('')
     return board, playerFourInLine
 
 # Se define lo que se hace si el humano gana
